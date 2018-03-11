@@ -8,6 +8,8 @@ const QUERY = gql`
     feed {
       links {
         id
+        description
+        url
       }
     }
   }
