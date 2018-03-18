@@ -13,12 +13,15 @@ export function Header(props) {
         </Link>
         <div className="ml1">
           {isLoggedIn() ? (
-            <div>
+            <div className="flex">
               <div className="ml1">|</div>
               <Link to="/create" className="ml1 black no-underline">
                 submit
               </Link>
-              <button className="black no-underline" onClick={logOut}>
+              <button
+                className="ml1 black bg-transparent bn pointer"
+                onClick={logOut}
+              >
                 Log Out
               </button>
             </div>
