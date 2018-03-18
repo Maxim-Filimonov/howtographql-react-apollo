@@ -32,6 +32,7 @@ export class CreateLink extends Component {
         url
       }
     });
+    this.props.history.push("/");
   };
   render() {
     const { description, url } = this.state;
