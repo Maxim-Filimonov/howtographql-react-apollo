@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
 
+import { isLoggedIn } from "./loginService";
 export function Header(props) {
   return (
     <div className="flex pa1 justify-between nowrap orange">
