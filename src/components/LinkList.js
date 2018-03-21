@@ -25,7 +25,7 @@ export const GET_LINKS = gql`
   }
 `;
 
-const renderLink = (link, index) => (
+export const renderLink = (link, index) => (
   <Link key={link.id} link={link} index={index} />
 );
 export function LinkList({ feedQuery: { loading, error, feed } }) {

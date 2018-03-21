@@ -11,6 +11,10 @@ export function Header(props) {
         <Link to="/" className="ml1 black no-underline">
           new
         </Link>
+        <div className="ml1">|</div>
+        <Link to="/search" className="ml1 black no-underline">
+          search
+        </Link>
         <div className="ml1">
           {isLoggedIn() ? (
             <div className="flex">
@@ -19,7 +23,7 @@ export function Header(props) {
                 submit
               </Link>
               <button
-                className="ml1 black bg-transparent bn pointer"
+                className="ml1 black bg-transparent bn pointer rightl"
                 onClick={logOut}
               >
                 Log Out

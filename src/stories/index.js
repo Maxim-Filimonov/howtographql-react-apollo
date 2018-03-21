@@ -6,6 +6,7 @@ import { linkTo } from "@storybook/addon-links";
 
 import CreateLink from "../components/CreateLink";
 import { LinkList } from "../components/LinkList";
+import { Search } from "../components/Search";
 import Header from "../components/Header";
 
 import { ApolloProvider } from "react-apollo";
@@ -53,3 +54,5 @@ storiesOf("Header", module).add("Normal", () => (
     <Header />
   </BrowserRouter>
 ));
+
+storiesOf("Search", module).add("Default", () => <Search />);
