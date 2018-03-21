@@ -3,19 +3,31 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import Link from "./Link";
 
-const QUERY = gql`
+export const GET_LINKS = gql`
   query FeedQuery {
     feed {
       links {
         id
         description
         url
+        postedBy {
+          id
+          name
+        }
+        votes {
+          id
+          user {
+            id
+          }
+        }
       }
     }
   }
 `;
 
-const renderLink = link => <Link key={link.id} link={link} />;
+const renderLink = (link, index) => (
+  <Link key={link.id} link={link} index={index} />
+);
 export function LinkList({ feedQuery: { loading, error, feed } }) {
   if (loading) return <h1>Loading</h1>;
   if (feed) {
@@ -27,4 +39,4 @@ export function LinkList({ feedQuery: { loading, error, feed } }) {
   return <h1>DEFAULT</h1>;
 }
 
-export default graphql(QUERY, { name: "feedQuery" })(LinkList);
+export default graphql(GET_LINKS, { name: "feedQuery" })(LinkList);

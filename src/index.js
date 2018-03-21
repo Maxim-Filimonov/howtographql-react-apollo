@@ -23,7 +23,7 @@ const middlewareAuthLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 const link = middlewareAuthLink.concat(httplink);
-const cache = new InMemoryCache();
+const cache = new InMemoryCache({ dataIdFromObject: o => o.id });
 
 const client = new ApolloClient({ link, cache });
 

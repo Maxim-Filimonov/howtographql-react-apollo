@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
+import { GET_LINKS } from "./LinkList";
 
 const POST_MUTATION = gql`
   #2
   mutation PostMutation($description: String!, $url: String!) {
     post(description: $description, url: $url) {
+      __typename
       id
       createdAt
       url
@@ -30,7 +32,8 @@ export class CreateLink extends Component {
       variables: {
         description,
         url
-      }
+      },
+      refetchQueries: [{ query: GET_LINKS }]
     });
     this.props.history.push("/");
   };
