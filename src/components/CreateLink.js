@@ -7,11 +7,19 @@ const POST_MUTATION = gql`
   #2
   mutation PostMutation($description: String!, $url: String!) {
     post(description: $description, url: $url) {
-      __typename
       id
-      createdAt
-      url
       description
+      url
+      postedBy {
+        id
+        name
+      }
+      votes {
+        id
+        user {
+          id
+        }
+      }
     }
   }
 `;
@@ -33,7 +41,13 @@ export class CreateLink extends Component {
         description,
         url
       },
-      refetchQueries: [{ query: GET_LINKS }]
+      update: (proxy, { data: { post } }) => {
+        const data = proxy.readQuery({ query: GET_LINKS });
+
+        data.feed.links.push(post);
+
+        proxy.writeQuery({ query: GET_LINKS, data });
+      }
     });
     this.props.history.push("/");
   };
