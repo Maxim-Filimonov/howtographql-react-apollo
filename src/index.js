@@ -6,10 +6,12 @@ import registerServiceWorker from "./registerServiceWorker";
 import { ApolloProvider } from "react-apollo";
 import { ApolloClient } from "apollo-client";
 import { HttpLink } from "apollo-link-http";
-import { ApolloLink } from "apollo-client-preset";
+import { ApolloLink, split } from "apollo-client-preset";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { BrowserRouter } from "react-router-dom";
 import { getToken } from "./components/loginService";
+import { WebSocketLink } from "apollo-link-ws";
+import { getMainDefinition } from "apollo-utilities";
 
 const httplink = new HttpLink({ uri: "http://localhost:4000" });
 const middlewareAuthLink = new ApolloLink((operation, forward) => {
@@ -22,8 +24,27 @@ const middlewareAuthLink = new ApolloLink((operation, forward) => {
   });
   return forward(operation);
 });
-const link = middlewareAuthLink.concat(httplink);
+const httpLinkWithAuth = middlewareAuthLink.concat(httplink);
 const cache = new InMemoryCache({ dataIdFromObject: o => o.id });
+
+const wsLink = new WebSocketLink({
+  uri: "ws://localhost:4000",
+  options: {
+    reconnect: true,
+    connectionParams: {
+      authToken: getToken()
+    }
+  }
+});
+
+const link = split(
+  ({ query }) => {
+    const { kind, operation } = getMainDefinition(query);
+    return kind === "OperationDefinition" && operation === "subscription";
+  },
+  wsLink,
+  httpLinkWithAuth
+);
 
 const client = new ApolloClient({ link, cache });
 
