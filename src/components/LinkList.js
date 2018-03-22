@@ -24,13 +24,44 @@ export const GET_LINKS = gql`
     }
   }
 `;
+const subscribeToNewVotes = props => {
+  props.feedQuery.subscribeToMore({
+    document: gql`
+      subscription {
+        newVote {
+          node {
+            id
+            link {
+              id
+              url
+              description
+              createdAt
+              postedBy {
+                id
+                name
+              }
+              votes {
+                id
+                user {
+                  id
+                }
+              }
+            }
+            user {
+              id
+            }
+          }
+        }
+      }
+    `
+  });
+};
 const subscribeToNewLinks = props => {
   props.feedQuery.subscribeToMore({
     document: gql`
       subscription {
         newLink {
           node {
-            __typename
             id
             description
             url
@@ -73,6 +104,7 @@ export const renderLink = (link, index) => (
 export class LinkListWithSub extends Component {
   componentDidMount() {
     subscribeToNewLinks(this.props);
+    subscribeToNewVotes(this.props);
   }
   render() {
     return <LinkList {...this.props} />;
