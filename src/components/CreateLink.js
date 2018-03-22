@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
-import { GET_LINKS } from "./LinkList";
+import { GET_LINKS, LINKS_ON_PAGE } from "./LinkList";
 
 const POST_MUTATION = gql`
   #2
@@ -42,11 +42,21 @@ export class CreateLink extends Component {
         url
       },
       update: (proxy, { data: { post } }) => {
-        const data = proxy.readQuery({ query: GET_LINKS });
+        const first = LINKS_ON_PAGE;
+        const skip = 0;
+        const orderBy = "createdAt_DESC";
+        const data = proxy.readQuery({
+          query: GET_LINKS,
+          variables: { first, skip, orderBy }
+        });
 
         data.feed.links.push(post);
 
-        proxy.writeQuery({ query: GET_LINKS, data });
+        proxy.writeQuery({
+          query: GET_LINKS,
+          data,
+          variables: { first, skip, orderBy }
+        });
       }
     });
     this.props.history.push("/");

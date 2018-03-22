@@ -8,6 +8,10 @@ export function Header(props) {
     <div className="flex pa1 justify-between nowrap orange">
       <div className="flex black">
         <div className="fw7 mr1">Kinda News</div>
+        <Link to="/top" className="ml1 black no-underline">
+          top
+        </Link>
+        <div className="ml1">|</div>
         <Link to="/" className="ml1 black no-underline">
           new
         </Link>

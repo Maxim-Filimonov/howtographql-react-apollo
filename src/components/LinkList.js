@@ -4,8 +4,9 @@ import { graphql } from "react-apollo";
 import Link from "./Link";
 
 export const GET_LINKS = gql`
-  query FeedQuery {
-    feed {
+  query FeedQuery($first: Int, $skip: Int, $orderBy: LinkOrderByInput) {
+    feed(first: $first, skip: $skip, orderBy: $orderBy) {
+      count
       links {
         id
         description
@@ -110,10 +111,54 @@ export class LinkListWithSub extends Component {
     return <LinkList {...this.props} />;
   }
 }
-export function LinkList({ feedQuery: { loading, error, feed } }) {
+const getLinksToRender = (feed, newPage) => {
+  if (newPage) {
+    return feed.links;
+  } else {
+    const rankedList = feed.links.slice();
+    rankedList.sort((l1, l2) => l2.votes.length - l1.votes.length);
+    return rankedList;
+  }
+};
+const previousPage = (match, history) => () => {
+  let page = getCurrentPage(match);
+  if (page > 1) {
+    page -= 1;
+    history.push(`/new/${page}`);
+  }
+};
+const nextPage = (match, history, feed) => () => {
+  let page = getCurrentPage(match);
+  if (page <= feed.count / LINKS_ON_PAGE) {
+    console.log("NEW PA");
+    page += 1;
+    history.push(`/new/${page}`);
+  }
+};
+export function LinkList({
+  feedQuery: { loading, error, feed },
+  location,
+  match,
+  history
+}) {
   if (loading) return <h1>Loading</h1>;
   if (feed) {
-    return <div>{feed.links.map(renderLink)}</div>;
+    const newPage = isNewPage(location);
+    const links = getLinksToRender(feed, newPage);
+    const page = getCurrentPage(match);
+    return (
+      <div>
+        <div>{links.map(renderLink)}</div>
+        {newPage && (
+          <div className="flex gray">
+            <button onClick={previousPage(match, history)}>
+              Previous Page
+            </button>
+            <button onClick={nextPage(match, history, feed)}>Next Page</button>
+          </div>
+        )}
+      </div>
+    );
   }
   if (error) {
     return <div>error</div>;
@@ -121,4 +166,23 @@ export function LinkList({ feedQuery: { loading, error, feed } }) {
   return <h1>DEFAULT</h1>;
 }
 
-export default graphql(GET_LINKS, { name: "feedQuery" })(LinkListWithSub);
+export const LINKS_ON_PAGE = 20;
+const isNewPage = location => location.pathname.includes("new");
+const getCurrentPage = match => parseInt(match.params.page, 10);
+export default graphql(GET_LINKS, {
+  name: "feedQuery",
+  options: ({ match, location }) => {
+    const page = getCurrentPage(match);
+    let skip = 0;
+    let first = 100;
+    let orderBy = null;
+    if (isNewPage(location)) {
+      skip = (page - 1) * LINKS_ON_PAGE;
+      first = LINKS_ON_PAGE;
+      orderBy = "createdAt_DESC";
+    }
+    return {
+      variables: { first, skip, orderBy }
+    };
+  }
+})(LinkListWithSub);
