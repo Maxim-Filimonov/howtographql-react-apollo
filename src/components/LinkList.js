@@ -34,6 +34,7 @@ const subscribeToNewLinks = props => {
 export const renderLink = (link, index) => (
   <Link key={link.id} link={link} index={index} />
 );
+
 export class LinkListWithSub extends Component {
   componentDidMount() {
     subscribeToNewLinks(this.props);
