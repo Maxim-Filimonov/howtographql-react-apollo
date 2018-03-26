@@ -3,7 +3,8 @@ import { Switch, Route, Redirect } from "react-router";
 
 import logo from "../logo.svg";
 import "../styles/App.css";
-import LinkList from "./LinkList";
+import PagedLinkList from "./PagedLinkList";
+import TopLinkList from "./TopLinkList";
 import Header from "./Header";
 import CreateLink from "./CreateLink";
 import Login from "./Login";
@@ -20,8 +21,8 @@ class App extends Component {
             <Route exact path="/login" component={Login} />
             <Route exact path="/create" component={CreateLink} />
             <Route exact path="/search" component={Search} />
-            <Route exact path="/top" component={LinkList} />
-            <Route exact path="/new/:page" component={LinkList} />
+            <Route exact path="/top" component={TopLinkList} />
+            <Route exact path="/new/:page" component={PagedLinkList} />
           </Switch>
         </div>
       </div>
