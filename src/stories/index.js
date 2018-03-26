@@ -5,7 +5,7 @@ import { action } from "@storybook/addon-actions";
 import { linkTo } from "@storybook/addon-links";
 
 import CreateLink from "../components/CreateLink";
-import { LinkList } from "../components/LinkList";
+import LinkList from "../components/LinkList";
 import { Search } from "../components/Search";
 import Header from "../components/Header";
 
@@ -30,23 +30,25 @@ storiesOf("CreateLink", module)
   ));
 
 storiesOf("LinkList", module).add("With Static Links", () => (
-  <LinkList
-    feedQuery={{
-      loading: false,
-      feed: {
-        links: [
-          {
-            url: "test.com",
-            description: "blabla"
-          },
-          {
-            url: "google.com",
-            description: "Check out this new search engine"
-          }
-        ]
-      }
-    }}
-  />
+  <ApolloProvider client={client}>
+    <LinkList
+      feedQuery={{
+        loading: false,
+        feed: {
+          links: [
+            {
+              url: "test.com",
+              description: "blabla"
+            },
+            {
+              url: "google.com",
+              description: "Check out this new search engine"
+            }
+          ]
+        }
+      }}
+    />
+  </ApolloProvider>
 ));
 
 storiesOf("Header", module).add("Normal", () => (

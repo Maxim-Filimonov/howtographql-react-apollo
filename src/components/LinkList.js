@@ -1,101 +1,32 @@
 import React, { Component } from "react";
-import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import Link from "./Link";
+import { GetLinks, SubscriptionNewLink, SubscriptionNewVote } from "./queries";
 
-export const GET_LINKS = gql`
-  query FeedQuery($first: Int, $skip: Int, $orderBy: LinkOrderByInput) {
-    feed(first: $first, skip: $skip, orderBy: $orderBy) {
-      count
-      links {
-        id
-        description
-        url
-        postedBy {
-          id
-          name
-        }
-        votes {
-          id
-          user {
-            id
-          }
-        }
-      }
-    }
-  }
-`;
 const subscribeToNewVotes = props => {
   props.feedQuery.subscribeToMore({
-    document: gql`
-      subscription {
-        newVote {
-          node {
-            id
-            link {
-              id
-              url
-              description
-              createdAt
-              postedBy {
-                id
-                name
-              }
-              votes {
-                id
-                user {
-                  id
-                }
-              }
-            }
-            user {
-              id
-            }
-          }
-        }
-      }
-    `
+    document: SubscriptionNewVote
   });
 };
+
 const subscribeToNewLinks = props => {
   props.feedQuery.subscribeToMore({
-    document: gql`
-      subscription {
-        newLink {
-          node {
-            id
-            description
-            url
-            postedBy {
-              id
-              name
-            }
-            votes {
-              id
-              user {
-                id
-              }
-            }
-          }
-        }
-      }
-    `,
-    updateQuery: (previous, { subscriptionData }) => {
-      const newLinks = [
-        ...previous.feed.links,
-        subscriptionData.data.newLink.node
-      ];
-      const result = {
-        ...previous,
-        feed: {
-          ...previous.feed,
-          links: newLinks
-        }
-      };
+    document: SubscriptionNewLink // updateQuery: (previous, { subscriptionData }) => {
+    //   const newLinks = [
+    //     ...previous.feed.links,
+    //     subscriptionData.data.newLink.node
+    //   ];
+    //   const result = {
+    //     ...previous,
+    //     feed: {
+    //       ...previous.feed,
+    //       links: newLinks
+    //     }
+    //   };
 
-      console.log("UPDATING SUB", previous, result);
-      return result;
-    }
+    //   console.log("UPDATING SUB", previous, result);
+    //   return result;
+    // }
   });
 };
 
@@ -116,7 +47,7 @@ const getLinksToRender = (feed, newPage) => {
     return feed.links;
   } else {
     const rankedList = feed.links.slice();
-    rankedList.sort((l1, l2) => l2.votes.length - l1.votes.length);
+    rankedList.sort((l1, l2) => l2.votes - l1.votes.length);
     return rankedList;
   }
 };
@@ -135,6 +66,7 @@ const nextPage = (match, history, feed) => () => {
     history.push(`/new/${page}`);
   }
 };
+
 export function LinkList({
   feedQuery: { loading, error, feed },
   location,
@@ -161,15 +93,17 @@ export function LinkList({
     );
   }
   if (error) {
-    return <div>error</div>;
+    return <div>Something went wrong: {error}</div>;
   }
   return <h1>DEFAULT</h1>;
 }
 
 export const LINKS_ON_PAGE = 20;
-const isNewPage = location => location.pathname.includes("new");
-const getCurrentPage = match => parseInt(match.params.page, 10);
-export default graphql(GET_LINKS, {
+const isNewPage = location =>
+  location == !undefined ? location.pathname.includes("new") : "";
+const getCurrentPage = match =>
+  match !== undefined ? parseInt(match.params.page, 10) : 10;
+export default graphql(GetLinks, {
   name: "feedQuery",
   options: ({ match, location }) => {
     const page = getCurrentPage(match);
