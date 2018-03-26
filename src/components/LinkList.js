@@ -11,22 +11,23 @@ const subscribeToNewVotes = props => {
 
 const subscribeToNewLinks = props => {
   props.feedQuery.subscribeToMore({
-    document: SubscriptionNewLink // updateQuery: (previous, { subscriptionData }) => {
-    //   const newLinks = [
-    //     ...previous.feed.links,
-    //     subscriptionData.data.newLink.node
-    //   ];
-    //   const result = {
-    //     ...previous,
-    //     feed: {
-    //       ...previous.feed,
-    //       links: newLinks
-    //     }
-    //   };
+    document: SubscriptionNewLink,
+    updateQuery: (previous, { subscriptionData }) => {
+      const newLinks = [
+        ...(previous.feed !== undefined ? previous.feed.links : {}),
+        subscriptionData.data.newLink.node
+      ];
+      const result = {
+        ...previous,
+        feed: {
+          ...previous.feed,
+          links: newLinks
+        }
+      };
 
-    //   console.log("UPDATING SUB", previous, result);
-    //   return result;
-    // }
+      console.log("UPDATING SUB", previous, result);
+      return result;
+    }
   });
 };
 
