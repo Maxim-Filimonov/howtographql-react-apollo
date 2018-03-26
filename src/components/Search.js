@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { withApollo } from "react-apollo";
 import gql from "graphql-tag";
 import Link from "./Link";
-import { renderLink } from "./LinkList";
+import { LinkListWithSub } from "./LinkList";
 
 const SEARCH_QUERY = gql`
   query SearchQuery($filter: String!) {
@@ -43,7 +43,11 @@ export class Search extends Component {
       variables: { filter }
     });
     const links = result.data.feed.links;
-    this.setState({ links, loading: false });
+    this.setState({
+      links,
+      loading: false,
+      subscribeToMore: result.subscribeToMore
+    });
   };
   render() {
     if (this.state.loading) {
@@ -56,7 +60,10 @@ export class Search extends Component {
             <input type="text" onChange={this.onSearchChange} />
             <button onClick={this.onSearchSubmit}>Go!</button>
           </div>
-          {this.state.links.map(renderLink)}
+          <LinkListWithSub
+            links={this.state.links}
+            subscribeToMore={this.state.subscribeToMore}
+          />
         </div>
       );
     }
